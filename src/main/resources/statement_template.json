@@ -1,0 +1,39 @@
+{
+    "header": {
+        "created-by": "@fixed{DATA-Generator}",
+        "created-on": "@fixed{$NOW}",        
+        "source-system": "@random{121212,232323,343434,454545,565656}",
+        "tran-id": "@fixed{$UUID}"
+    },
+    "document-info" : {
+        "document-id": "@fixed{$UUID}",
+        "document-alternate-id": "@oneof{$UUID,$BLANK}",
+        "document-repo-id": "@random{123456,987654,546378,876543}",
+        "document-category": "@fixed{ACCOUNT_STATEMENT}",
+        "document-type": "@random{MONTHLY, QUARTERLY, ANNUAL}"
+
+    },
+    "document": {
+        "customer": {
+            "id": "@random{$NUMBER}",
+            "first-name": "@random{$FILE:data/firstnames.csv}",
+            "last-name": "@random{$FILE:data/lastnames.csv}",
+            "goverment-id": "@random{$NUMBER}"
+        },
+        "accounts": 
+            {
+                "account": {
+                    "id": "@random{$NUMBER}",
+                    "type": "@random{CHECKING, SAVING, MORTGAGE, CARD, AUTO FINANCE}",
+                    "product-code": "@random{100, 120, 240, 450, 125}",
+                    "sub-product-code": "@random{1,10,20,30,40,50,60}"
+                }
+            }
+        ,
+        "statement": {
+            "statement-id": "@fixed{$NUMBER}",
+            "statement-date": "@fixed{$NOW}"
+            
+        }      
+    }
+ }

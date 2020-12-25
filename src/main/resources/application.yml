@@ -1,0 +1,47 @@
+###############################################################################################
+# Test data came from here                                                                    #
+# https://www2.census.gov/programs-surveys/bds/tables/time-series/bds2018_msa_sector_fage.csv #
+###############################################################################################
+
+spring:
+  profiles.active: data-generator, file-writer
+  application.name: Document DB Test
+  main:
+    banner-mode: off
+    web-application-type: none
+
+logging:
+  file: documents.log
+  level:
+    org.springframework: WARN
+    net.explore.nosql: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level - %msg%n"
+
+# Defaults. Can be overridden in profiles
+document-writer: file
+batch-size: 100
+number-of-documents: 1000000
+document-format: JSON
+---
+spring.config.activate.on-profile: mongo
+database: mongo
+connection-url: 192.168.1.51:27017
+---
+spring.config.activate.on-profile: marklogic
+database: marklogic
+host: 192.168.1.41
+port: 8020
+login:
+    as: mluser
+    using: mluser
+---
+spring.config.activate.on-profile: data-generator
+template-file: templates/simple_template.json
+---
+spring.config.activate.on-profile: file-writer
+folder-path: "C:/Work/Generated"
+
+
+

@@ -1,0 +1,24 @@
+{
+    "header": {
+        "created-by": "Yashvant Mhetre",
+        "created-on": "$NOW$",
+        "source-system": "$ONE-OF${123456,987654,546378,876543}",
+        "tran-id": "$UUID$"
+    },
+    "document-info" : {
+        "document-id": "$UUID$",
+        "document-alternate-id": "$ONE-OF${$UUID$,$BLANK$}",
+        "document-repo-id": "$ONE-OF${123456,987654,546378,876543}",
+        "document-category": "ACCOUNT_STATEMENT",
+        "document-type": "$ONE-OF${MONTHLY, QUARTERLY, ANNUAL}"
+
+    },
+    "document": {
+        "customer": {
+            "id": "$RANDOM-NUMBER$",
+            "first-name": "$ONE-OF${Michael, Jonathan, Tracy, Sujeeth, Nancy, Lucy}",
+            "last-name": "$ONE-OF${Jordan, Gordon, Lu, Patel, Soso, Birnigham}",
+            "government-id": "$RANDOM-NUMBER$"
+        }
+    }
+}

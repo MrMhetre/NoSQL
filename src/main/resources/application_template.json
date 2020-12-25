@@ -1,0 +1,44 @@
+{
+    "header": {
+        "created-by": "example glossary",
+        "created-on": "",        
+        "source-system": "",
+        "tran-id": ""
+    },
+    "document-info" : {
+        "document-id": "",
+        "document-alternate-id": "",
+        "document-repo-id": "",
+        "document-category": "",
+        "document-type": ""
+    },
+    "document": {
+        "application": {
+            "id": "",
+            "applied-on": "",
+            "product-code": "",
+            "sub-product-code": "",
+            "branch-code": "",
+            "reffered-by": {
+                "customer-id": "",
+                "prime-customer": ""
+            }
+        },
+        "borrower":[
+            {
+                "id": "",
+                "first-name": "",
+                "last-name": "",
+                "goverment-id": ""
+            }
+        ],
+        "co-borrower":[
+            {
+                "id": "",
+                "first-name": "",
+                "last-name": "",
+                "goverment-id": ""
+            }
+        ]
+    }
+ }
