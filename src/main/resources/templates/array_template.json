@@ -4,7 +4,7 @@
             "customer": {
                 "id": "$RANDOM_NUMBER$",
                 "first-name": "$ONE_OF${Michael, Jonathan, Tracy, Sujeeth, Nancy, Lucy}",
-                "last-name": "$ONE_OF${Jordan, Gordon, Lu, Patel, Soso, Birnigham, $BLANK$}",
+                "last-name": "$ONE_OF${Jordan, Gordon, Lu, Patel, Sosa, Birmingham, $BLANK$}",
                 "government-id": "$RANDOM_NUMBER$",
                 "citizenship": ["$ONE_OF${America, Britain, Canada}"]
             }

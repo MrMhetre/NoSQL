@@ -3,7 +3,6 @@ package net.explore.nosql;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -15,6 +14,7 @@ import com.google.gson.internal.LinkedTreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.json.JsonParserFactory;
@@ -25,6 +25,9 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(name="document-format", havingValue = "JSON")
 public class JsonDocumentGenerator implements DocumentGenerator {
     Logger logger = LoggerFactory.getLogger(JsonDocumentGenerator.class);
+
+    @Value("${max-array-length}")
+    int maxArrayLength;
 
     @Override
     @Async
@@ -79,7 +82,7 @@ public class JsonDocumentGenerator implements DocumentGenerator {
         } else if (valueObject instanceof  ArrayList) {
             Object[] objectsArray = ((ArrayList<?>) valueObject).toArray();
             Object object = objectsArray[0];
-            int numberOfObjects = ThreadLocalRandom.current().nextInt(1, 5);
+            int numberOfObjects = ThreadLocalRandom.current().nextInt(1, (maxArrayLength +1));
             logger.debug("numberOfObjects: " + numberOfObjects);
             Object[] processedArray = new Object[numberOfObjects];
             for (int i=0; i< numberOfObjects; i++) {
@@ -90,70 +93,12 @@ public class JsonDocumentGenerator implements DocumentGenerator {
         } else {
             // leaf node
             String value = valueObject.toString();
-            value = getLeafNodeValue(value);
+            value = NodeValue.getLeafNodeValue(value);
             return value;
             // System.out.println(" >> " + value);
         }
     }
 
-    private HashMap<String, String[]> parseInstruction(String inputInstruction) {
-        String[] arguments = new String[]{""};
-        String instruction = inputInstruction;
-        if(Value.hasInstruction(inputInstruction)) {
-            int beginIndex = inputInstruction.indexOf("$") + 1;
-            int endIndex = inputInstruction.indexOf("$", beginIndex);
-            instruction = inputInstruction.substring(beginIndex, endIndex);
-        }
 
-        if(inputInstruction.contains("{") && inputInstruction.contains("}")) {
-            String tempString = inputInstruction.substring(inputInstruction.indexOf("{") + 1, inputInstruction.indexOf("}"));
-            arguments = tempString.split(",");
-        }
-
-        HashMap<String, String[]> parsedInstruction = new HashMap<>();
-        parsedInstruction.put(instruction,arguments);
-        return parsedInstruction;
-    }
-
-    public String processInstruction(HashMap<String, String[]> instructionWithArgs) {
-        String processedInstruction = "";
-        String instruction = instructionWithArgs.keySet().iterator().next().toUpperCase();
-        String[] arguments = instructionWithArgs.get(instruction);
-
-        switch (instruction) {
-            case "NOW":
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy'T'HH:mm:ssZ");
-                processedInstruction = dateFormat.format(new Date());
-                break;
-            case "ONE_OF":
-                int randomIndex =
-                    arguments.length > 1 ? (new Random()).nextInt(arguments.length) : 0;
-                String pickedValue = arguments[ randomIndex];
-                if(Value.hasInstruction(pickedValue)) {
-                    processedInstruction = processInstruction(parseInstruction(pickedValue));
-                } else {
-                    processedInstruction = pickedValue;
-                }
-                break;
-            case "UUID":
-                processedInstruction = UUID.randomUUID().toString();
-                break;
-            case "RANDOM_NUMBER":
-                processedInstruction = Integer.toString(ThreadLocalRandom.current().nextInt(1000000));
-                break;
-            case "BLANK":
-                processedInstruction = "";
-                break;
-        }
-        return processedInstruction.trim();
-    }
-
-    public String getLeafNodeValue(String nodeValue) {
-        if(!Value.hasInstruction(nodeValue)) {
-            return nodeValue;
-        } else {
-            return processInstruction(parseInstruction(nodeValue));
-        }
-    }
 
 }

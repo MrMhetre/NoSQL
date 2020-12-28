@@ -1,0 +1,11 @@
+{
+    "header": {
+        "created-by": "Yashvant Mhetre",
+        "created-on": "$NOW${%1$tD %1$tT}",
+        "added-on": "$NOW$",
+        "source-system": "$ONE_OF${123456,987654,546378,876543}",
+        "tran-id": "$UUID$",
+        "random-number": "$RANDOM_NUMBER$",
+        "second-random-number": "$RANDOM_NUMBER${%012.0f}"
+    }
+}
