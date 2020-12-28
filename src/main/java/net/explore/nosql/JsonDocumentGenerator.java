@@ -6,12 +6,15 @@ import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.json.JsonParserFactory;
@@ -21,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Service
 @ConditionalOnProperty(name="document-format", havingValue = "JSON")
 public class JsonDocumentGenerator implements DocumentGenerator {
-
+    Logger logger = LoggerFactory.getLogger(JsonDocumentGenerator.class);
 
     @Override
     @Async
@@ -53,12 +56,11 @@ public class JsonDocumentGenerator implements DocumentGenerator {
 
     private String convertToJson(LinkedTreeMap<String, Object> processLinkedTreeMap) {
         GsonBuilder gsonBuilder = new GsonBuilder();
-//        gsonBuilder.setPrettyPrinting();
+        gsonBuilder.setPrettyPrinting();
         gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES);
         Gson gson = gsonBuilder.create();
-        String json = gson.toJson(processLinkedTreeMap);
 
-        return json;
+        return gson.toJson(processLinkedTreeMap);
     }
 
     private LinkedTreeMap<String, Object> processJsonMap(Map<String, Object> linkedTreeMap) {
@@ -66,18 +68,32 @@ public class JsonDocumentGenerator implements DocumentGenerator {
         for(Map.Entry<String, Object> jsonEntry : linkedTreeMap.entrySet()) {
             String key = jsonEntry.getKey();
             Object valueObject = jsonEntry.getValue();
-            if (valueObject instanceof LinkedTreeMap) {
-                LinkedTreeMap<String, Object> treeMap = processJsonMap((LinkedTreeMap<String, Object>) valueObject);
-                postProcessedMap.put(key, treeMap);
-            } else {
-                // leaf node
-                String value = valueObject.toString();
-                value = getLeafNodeValue(value);                
-                postProcessedMap.put(key, value);
-                // System.out.println(" >> " + value);
-            }
+            postProcessedMap.put(key, processValueObject(valueObject));
         }
         return postProcessedMap;
+    }
+
+    private Object processValueObject(Object valueObject) {
+        if (valueObject instanceof LinkedTreeMap) {
+            return processJsonMap((LinkedTreeMap<String, Object>) valueObject);
+        } else if (valueObject instanceof  ArrayList) {
+            Object[] objectsArray = ((ArrayList<?>) valueObject).toArray();
+            Object object = objectsArray[0];
+            int numberOfObjects = ThreadLocalRandom.current().nextInt(1, 5);
+            logger.debug("numberOfObjects: " + numberOfObjects);
+            Object[] processedArray = new Object[numberOfObjects];
+            for (int i=0; i< numberOfObjects; i++) {
+                processedArray[i] = processValueObject(object);
+            }
+
+            return processedArray;
+        } else {
+            // leaf node
+            String value = valueObject.toString();
+            value = getLeafNodeValue(value);
+            return value;
+            // System.out.println(" >> " + value);
+        }
     }
 
     private HashMap<String, String[]> parseInstruction(String inputInstruction) {
@@ -101,7 +117,7 @@ public class JsonDocumentGenerator implements DocumentGenerator {
 
     public String processInstruction(HashMap<String, String[]> instructionWithArgs) {
         String processedInstruction = "";
-        String instruction = instructionWithArgs.keySet().iterator().next().toString().toUpperCase();
+        String instruction = instructionWithArgs.keySet().iterator().next().toUpperCase();
         String[] arguments = instructionWithArgs.get(instruction);
 
         switch (instruction) {
@@ -123,7 +139,7 @@ public class JsonDocumentGenerator implements DocumentGenerator {
                 processedInstruction = UUID.randomUUID().toString();
                 break;
             case "RANDOM_NUMBER":
-                processedInstruction = Integer.toString(new Random().nextInt(1000000));
+                processedInstruction = Integer.toString(ThreadLocalRandom.current().nextInt(1000000));
                 break;
             case "BLANK":
                 processedInstruction = "";

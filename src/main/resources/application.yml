@@ -21,8 +21,8 @@ logging:
 
 # Defaults. Can be overridden in profiles
 document-writer: file
-batch-size: 100
-number-of-documents: 1000000
+batch-size: 10
+number-of-documents: 1
 document-format: JSON
 ---
 spring.config.activate.on-profile: mongo
@@ -38,7 +38,7 @@ login:
     using: mluser
 ---
 spring.config.activate.on-profile: data-generator
-template-file: templates/simple_template.json
+template-file: templates/array_template.json
 ---
 spring.config.activate.on-profile: file-writer
 folder-path: "C:/Work/Generated"
