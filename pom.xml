@@ -68,6 +68,23 @@
 					<target>11</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.jsonschema2pojo</groupId>
+				<artifactId>jsonschema2pojo-maven-plugin</artifactId>
+				<version>1.0.2</version>
+				<configuration>
+					<sourceDirectory>${basedir}/src/main/resources/templates/loanDocument.json</sourceDirectory>
+					<sourceType>json</sourceType>
+					<targetPackage>net.explore.nosql.model</targetPackage>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 

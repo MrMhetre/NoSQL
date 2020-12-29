@@ -1,0 +1,9 @@
+{
+  "document-info" : {
+    "document-id": "$ONE_OF${P8,ODS,ODH}:$UUID$",
+    "document-alternate-id": "$ONE_OF${$UUID$,$BLANK$}",
+    "document-repo-id": "$ONE_OF${123456,987654,546378,876543}",
+    "document-category": "ACCOUNT_STATEMENT",
+    "document-type": "$ONE_OF${MONTHLY, QUARTERLY, ANNUAL}"
+  }
+}

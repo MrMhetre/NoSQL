@@ -1,11 +1,13 @@
 {
     "header": {
-        "created-by": "Yashvant Mhetre",
-        "created-on": "$NOW${%1$tD %1$tT}",
-        "added-on": "$NOW$",
-        "source-system": "$ONE_OF${123456,987654,546378,876543}",
-        "tran-id": "$UUID$",
+        "static-text": "Yashvant Mhetre",
+        "now": "$NOW$",
+        "now-with-format": "$NOW${%1$tD %1$tT}",
+        "one-of": "$ONE_OF${123456,987654,546378,876543}",
+        "uuid": "$UUID$",
         "random-number": "$RANDOM_NUMBER$",
-        "second-random-number": "$RANDOM_NUMBER${%012.0f}"
+        "random-number-with-format": "$RANDOM_NUMBER${%012.0f}",
+        "random-date-time": "$RANDOM_DATE_TIME$",
+        "random-date-time-with-format": "$RANDOM_DATE_TIME${%1$tF %1$tT}"
     }
 }

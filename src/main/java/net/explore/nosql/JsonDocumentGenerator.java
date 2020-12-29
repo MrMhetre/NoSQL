@@ -14,6 +14,7 @@ import com.google.gson.internal.LinkedTreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.json.JsonParser;
@@ -24,10 +25,12 @@ import org.springframework.stereotype.Service;
 @Service
 @ConditionalOnProperty(name="document-format", havingValue = "JSON")
 public class JsonDocumentGenerator implements DocumentGenerator {
-    Logger logger = LoggerFactory.getLogger(JsonDocumentGenerator.class);
 
     @Value("${max-array-length}")
     int maxArrayLength;
+
+    @Autowired
+    NodeValue nodeValue;
 
     @Override
     @Async
@@ -83,7 +86,6 @@ public class JsonDocumentGenerator implements DocumentGenerator {
             Object[] objectsArray = ((ArrayList<?>) valueObject).toArray();
             Object object = objectsArray[0];
             int numberOfObjects = ThreadLocalRandom.current().nextInt(1, (maxArrayLength +1));
-            logger.debug("numberOfObjects: " + numberOfObjects);
             Object[] processedArray = new Object[numberOfObjects];
             for (int i=0; i< numberOfObjects; i++) {
                 processedArray[i] = processValueObject(object);
@@ -93,9 +95,8 @@ public class JsonDocumentGenerator implements DocumentGenerator {
         } else {
             // leaf node
             String value = valueObject.toString();
-            value = NodeValue.getLeafNodeValue(value);
+            value = nodeValue.getLeafNodeValue(value);
             return value;
-            // System.out.println(" >> " + value);
         }
     }
 

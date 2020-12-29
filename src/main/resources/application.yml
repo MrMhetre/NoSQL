@@ -14,15 +14,15 @@ logging:
   file: documents.log
   level:
     org.springframework: WARN
-    net.explore.nosql: DEBUG
+    net.explore.nosql: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level - %msg%n"
 
 # Defaults. Can be overridden in profiles
-document-writer: file
-batch-size: 10
-number-of-documents: 10
+document-writer: zip
+batch-size: 10000
+number-of-documents: 1000000
 document-format: JSON
 ---
 spring.config.activate.on-profile: mongo
@@ -38,11 +38,13 @@ login:
     using: mluser
 ---
 spring.config.activate.on-profile: data-generator
-template-file: templates/format_template.json
-max-array-length: 1
+template-file: templates/loanDocument.json
+max-array-length: 3
+min-date-bound: 1262304000
+#max-date-bound: 1609185639
 ---
 spring.config.activate.on-profile: file-writer
-folder-path: "C:/Work/Generated"
+folder-path: "C:/Work/Generated2"
 
 
 

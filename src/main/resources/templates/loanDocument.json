@@ -1,0 +1,50 @@
+{
+  "meta" : {
+    "_created": "$RANDOM_DATE_TIME$",
+    "_updated": "$NOW$",
+    "_crl_id":"$UUID$",
+    "_src": {
+      "_src_created": "$RANDOM_DATE_TIME$",
+      "_src_system": "P8",
+      "_src_container": "ObjectStore-1",
+      "_src_folder": "Loans"
+    },
+    "_load": {
+      "_load_batch_file": "load_$RANDOM_NUMBER$.zip",
+      "_load_file_ts": "$RANDOM_DATE_TIME$",
+      "_load_event_enabled": "Y"
+    }
+  },
+  "document": {
+    "retention_event_dt": "$RANDOM_DATE_TIME$",
+    "exception_state_ind": "$ONE_OF${Y, N}",
+    "archived_ind": "$ONE_OF${Y, N}",
+    "loan_org_cd": "$RANDOM_NUMBER$",
+    "doc_created": "$RANDOM_DATE_TIME$",
+    "doc_created_by": "$ONE_OF${E123456, F5678493, D657489, J879604}",
+    "logically_deleted_ind": "N",
+    "date_checked_in": "$RANDOM_DATE_TIME${%tF}",
+    "bytes_count": "$RANDOM_NUMBER$",
+    "version_status": "1",
+    "mime_type": "application/$ONE_OF${PDF, TXT}",
+    "employee_loan_ind": "$ONE_OF${Y,N}",
+    "frozen_ind": "N",
+    "loan_org_id": "LO$RANDOM_NUMBER$",
+    "package_type": "Package Type",
+    "heritage_org_cd": "00001",
+    "doc_type_cd": "$ONE_OF${A123, B456, C678, D897, E234, F456, G8690, H23456, I6574, J768, K6578, L7685, M4738, N7685, O4950, P7586, Q321, R3045}",
+    "batch_id": "BR$RANDOM_NUMBER$",
+    "accounts": [
+      {
+        "account": {
+          "account_number": "$RANDOM_NUMBER$"
+        }
+      }
+    ],
+    "is_current_version": "Y",
+    "alt_doc_type_cd": "$ONE_OF${123, 456, 678, 897, 234, 456, 8690, 23456, 6574, 768, 6578, 7685, 4738, 7685, 4950, 7586, 321, 3045}",
+    "received_time": "$RANDOM_DATE_TIME${%tF}",
+    "private_client_ind": "$ONE_OF${Y,N}",
+    "doc_id": "$UUID$"
+  }
+}

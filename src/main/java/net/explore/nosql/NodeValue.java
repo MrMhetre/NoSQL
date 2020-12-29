@@ -1,25 +1,35 @@
 package net.explore.nosql;
 
-import java.text.SimpleDateFormat;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Component
 public class NodeValue {
-    public static boolean beginsWithInstruction(String theValue) {
+    @Value("${min-date-bound:0}")
+    long minDateBound;
+
+    @Value("${max-date-bound: 1609188965}")
+    long maxDateBound;
+
+    public boolean beginsWithInstruction(String theValue) {
         return theValue.matches("^\\$.+?\\$.*");
     }
 
-    public static boolean hasOnlyInstruction(String theValue) {
+    public boolean hasOnlyInstruction(String theValue) {
         return theValue.matches("^\\$.+?\\$$");
     }
 
-    public static boolean hasInstruction(String theValue) {
+    public boolean hasInstruction(String theValue) {
         return theValue.matches("^.*\\$.+?\\$.*");
     }
 
-    public static String getInstruction(String theValue) {
+    public String getInstruction(String theValue) {
         int firstIndex = theValue.indexOf("$");
         return theValue.substring(firstIndex + 1, theValue.indexOf("$", firstIndex + 1));
     }
@@ -29,7 +39,7 @@ public class NodeValue {
      * @param instructionWithArgs map with instruction as key instruction arguments as value
      * @return processed String
      */
-    public static String processInstruction(HashMap<String, String[]> instructionWithArgs) {
+    public String processInstruction(HashMap<String, String[]> instructionWithArgs) {
         String processedInstruction = "";
         String instruction = instructionWithArgs.keySet().iterator().next().toUpperCase();
         String[] arguments = instructionWithArgs.get(instruction);
@@ -43,8 +53,8 @@ public class NodeValue {
                 int randomIndex =
                         hasUsableValue(arguments) ? ThreadLocalRandom.current().nextInt(arguments.length) : 0;
                 String pickedValue = hasUsableValue(arguments) ? arguments[ randomIndex]: "";
-                if(NodeValue.hasInstruction(pickedValue)) {
-                    processedInstruction = processInstruction(parseInstruction(pickedValue));
+                if(hasInstruction(pickedValue)) {
+                    processedInstruction = getLeafNodeValue(pickedValue);
                 } else {
                     processedInstruction = pickedValue;
                 }
@@ -56,6 +66,13 @@ public class NodeValue {
                 processedInstruction = String.format(
                         (hasUsableValue(arguments) ? arguments[0] : "%.0f"), ThreadLocalRandom.current().nextDouble(999999999));
                 break;
+            case "RANDOM_DATE_TIME":
+                long minBound = minDateBound;
+                long maxBound = (maxDateBound < 86400) ? (new Date().getTime())/1000 : maxDateBound;
+                long randomEpocTime = ThreadLocalRandom.current().nextLong(minBound, maxBound);
+                processedInstruction = String.format(
+                        (hasUsableValue(arguments) ? arguments[0] : "%1$tFT%1$tT"), (randomEpocTime * 1000));
+                break;
             case "BLANK":
                 processedInstruction = "";
                 break;
@@ -63,17 +80,17 @@ public class NodeValue {
         return processedInstruction.trim();
     }
 
-    public static HashMap<String, String[]> parseInstruction(String inputInstruction) {
+    public HashMap<String, String[]> parseInstruction(String inputInstruction) {
         String[] arguments = null; //new String[]{""};
         String instruction = inputInstruction;
-        if(NodeValue.hasInstruction(inputInstruction)) {
+        if(hasInstruction(inputInstruction)) {
             int beginIndex = inputInstruction.indexOf("$") + 1;
             int endIndex = inputInstruction.indexOf("$", beginIndex);
             instruction = inputInstruction.substring(beginIndex, endIndex);
         }
 
         if(inputInstruction.contains("{") && inputInstruction.contains("}")) {
-            String tempString = inputInstruction.substring(inputInstruction.indexOf("{") + 1, inputInstruction.indexOf("}"));
+            String tempString = inputInstruction.substring(inputInstruction.indexOf("{") + 1, inputInstruction.lastIndexOf("}"));
             arguments = tempString.split(",");
         }
 
@@ -82,14 +99,25 @@ public class NodeValue {
         return parsedInstruction;
     }
 
-    public static String getLeafNodeValue(String nodeValue) {
-        if(!NodeValue.hasInstruction(nodeValue)) {
+    public String getLeafNodeValue(String nodeValue) {
+        if(!hasInstruction(nodeValue)) {
             return nodeValue;
         } else {
-            return processInstruction(parseInstruction(nodeValue));
+            int instStartIndex = nodeValue.indexOf("$");
+            int instEndIndex = nodeValue.indexOf("$", instStartIndex + 1);
+            int argStartIndex = nodeValue.indexOf("{", instEndIndex + 1);
+            int argEndIndex = (argStartIndex > 0) ? nodeValue.lastIndexOf("}") : -1;
+            int instWithArgEndIndex = ((argEndIndex > 0) ? argEndIndex: instEndIndex) + 1;
+
+            String instructionWithArgs = nodeValue.substring(instStartIndex, instWithArgEndIndex);
+            String processedInstruction = processInstruction(parseInstruction(instructionWithArgs));
+
+            String prefix = (instStartIndex > 0) ? nodeValue.substring(0, instStartIndex): "";
+            String postfix = (instWithArgEndIndex < nodeValue.length()) ? nodeValue.substring(instWithArgEndIndex) : "";
+            return getLeafNodeValue(prefix + processedInstruction + postfix);
         }
     }
-    private static boolean hasUsableValue(String[] arrayToCheck) {
+    private boolean hasUsableValue(String[] arrayToCheck) {
         return arrayToCheck != null && arrayToCheck.length > 0 && arrayToCheck[0] != null && arrayToCheck[0].trim().length() > 0;
     }
 }
